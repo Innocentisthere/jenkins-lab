@@ -1,14 +1,13 @@
-from os import name
 from sklearn.preprocessing import StandardScaler, PowerTransformer
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import mlflow
 from sklearn.linear_model import SGDRegressor
 from sklearn.model_selection import GridSearchCV
-import numpy as np
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from mlflow.models import infer_signature
 import joblib
+import numpy as np
 
 
 def scale_frame(frame):
@@ -35,16 +34,16 @@ if __name__ == "__main__":
                                                     random_state=42)
     
 
-    params = {'alpha': [0.0001, 0.001, 0.01, 0.05, 0.1 ],
-            'l1_ratio': [0.001, 0.05, 0.01, 0.2],
+    params = {'alpha': np.linspace(0.0001, 10, 10),
+            'l1_ratio': np.linspace(0.0001, 1, 10),
             "penalty": ["l1","l2","elasticnet"],
             "loss": ['squared_error', 'huber', 'epsilon_insensitive'],
             "fit_intercept": [False, True],
             }
     
-    mlflow.set_experiment("linear model cars")
+    mlflow.set_experiment("medical_charges")
     with mlflow.start_run():
-        lr = SGDRegressor(random_state=42)
+        lr = SGDRegressor(random_state=192)
         clf = GridSearchCV(lr, params, cv = 3, n_jobs = 4)
         clf.fit(X_train, y_train.reshape(-1))
         best = clf.best_estimator_
@@ -70,7 +69,7 @@ if __name__ == "__main__":
         predictions = best.predict(X_train)
         signature = infer_signature(X_train, predictions)
         mlflow.sklearn.log_model(best, "model", signature=signature)
-        with open("lr_cars.pkl", "wb") as file:
+        with open("lr_medical_charges.pkl", "wb") as file:
             joblib.dump(lr, file)
 
     dfruns = mlflow.search_runs()

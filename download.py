@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.preprocessing import OrdinalEncoder
 
 def download_data():
     df = pd.read_csv('https://raw.githubusercontent.com/Innocentisthere/jenkins-lab/refs/heads/main/insurance.csv', delimiter = ',')
